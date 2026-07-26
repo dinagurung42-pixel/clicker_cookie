@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unicorn Clicker</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #2d1b69;
+      --panel: rgba(255, 255, 255, 0.14);
+      --text: #fff8f0;
+      --accent: #ff78c4;
+      --accent-2: #7df9ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top, #6f4ce6 0%, var(--bg) 45%, #140d2e 100%);
+      overflow: hidden;
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .game-shell {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .game-card {
+      width: min(92vw, 560px);
+      padding: 28px;
+      border-radius: 28px;
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.24em;
+      font-size: 0.82rem;
+      color: var(--accent-2);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 5vw, 2.8rem);
+    }
+
+    .subtitle,
+    .hint {
+      margin: 0 0 20px;
+      line-height: 1.5;
+      color: rgba(255, 248, 240, 0.9);
+    }
+
+    .scoreboard {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .scoreboard > div {
+      min-width: 100px;
+      padding: 12px 16px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .label {
+      display: block;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: rgba(255, 248, 240, 0.72);
+    }
+
+    strong {
+      font-size: 1.35rem;
+    }
+
+    .unicorn-button {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+      transition: transform 120ms ease, filter 120ms ease;
+    }
+
+    .unicorn-button:hover {
+      transform: translateY(-4px) scale(1.02);
+      filter: drop-shadow(0 12px 22px rgba(255, 120, 196, 0.38));
+    }
+
+    .unicorn-button:active {
+      transform: scale(0.96);
+    }
+
+    .unicorn-button svg {
+      width: min(72vw, 240px);
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .unicorn-button .halo {
+      fill: rgba(255, 255, 255, 0.25);
+    }
+
+    .unicorn-button .body {
+      fill: #fff8f0;
+    }
+
+    .unicorn-button .ear,
+    .unicorn-button .horn {
+      fill: #ffd166;
+    }
+
+    .unicorn-button .horn {
+      fill: #ff9f1c;
+    }
+
+    .unicorn-button .eye {
+      fill: #2b1f52;
+    }
+
+    .unicorn-button .mouth {
+      fill: none;
+      stroke: #ff6b6b;
+      stroke-width: 5;
+      stroke-linecap: round;
+    }
+
+    .unicorn-button .mane,
+    .unicorn-button .mane-detail {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 10;
+      stroke-linecap: round;
+    }
+
+    .unicorn-button .mane-detail {
+      stroke: var(--accent-2);
+      stroke-width: 7;
+    }
+
+    .unicorn-button.pop {
+      animation: pop 240ms ease;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti-canvas"></canvas>
+
+  <main class="game-shell">
+    <section class="game-card">
+      <p class="eyebrow">✨ Magical click game</p>
+      <h1>Unicorn Clicker</h1>
+      <p class="subtitle">Tap the unicorn to collect sparkles and make the party explode.</p>
+
+      <div class="scoreboard">
+        <div>
+          <span class="label">Clicks</span>
+          <strong id="score">0</strong>
+        </div>
+        <div>
+          <span class="label">Best</span>
+          <strong id="best-score">0</strong>
+        </div>
+      </div>
+
+      <button id="unicornButton" class="unicorn-button" aria-label="Click the unicorn">
+        <svg viewBox="0 0 240 240" role="img" aria-hidden="true">
+          <circle cx="120" cy="120" r="96" class="halo" />
+          <ellipse cx="120" cy="132" rx="62" ry="58" class="body" />
+          <path d="M96 70 L84 44 L118 52 L112 82 Z" class="ear" />
+          <path d="M144 70 L156 44 L122 52 L128 82 Z" class="ear" />
+          <path d="M115 48 L138 22 L164 62 L132 74 Z" class="horn" />
+          <circle cx="104" cy="132" r="6" class="eye" />
+          <circle cx="136" cy="132" r="6" class="eye" />
+          <path d="M102 160 Q120 178 138 160" class="mouth" />
+          <path d="M84 106 C84 84 102 70 120 70 C138 70 156 84 156 106" class="mane" />
+          <path d="M82 116 C92 102 108 100 120 104 C132 108 148 104 158 116" class="mane-detail" />
+        </svg>
+      </button>
+
+      <p class="hint">Each click creates a new burst of confetti.</p>
+    </section>
+  </main>
+
+  <script>
+    const button = document.getElementById('unicornButton');
+    const scoreEl = document.getElementById('score');
+    const bestScoreEl = document.getElementById('best-score');
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let score = 0;
+    let bestScore = Number(localStorage.getItem('unicorn-clicker-best') || 0);
+    let confettiPieces = [];
+    let animationFrameId = null;
+
+    function updateScoreboard() {
+      scoreEl.textContent = score;
+      bestScoreEl.textContent = bestScore;
+    }
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth * window.devicePixelRatio;
+      canvas.height = window.innerHeight * window.devicePixelRatio;
+      ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+    }
+
+    function burstConfetti(x, y) {
+      const colors = ['#ffd166', '#ff78c4', '#7df9ff', '#ffffff', '#ff6b6b'];
+
+      for (let i = 0; i < 32; i += 1) {
+        const piece = {
+          x,
+          y,
+          vx: (Math.random() - 0.5) * 7,
+          vy: (Math.random() - 0.8) * 8,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          alpha: 1,
+          life: Math.random() * 45 + 55,
+          rotation: Math.random() * Math.PI * 2,
+          spin: (Math.random() - 0.5) * 0.2,
+        };
+        confettiPieces.push(piece);
+      }
+    }
+
+    function animateConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = confettiPieces.length - 1; i >= 0; i -= 1) {
+        const piece = confettiPieces[i];
+        piece.x += piece.vx;
+        piece.y += piece.vy;
+        piece.vy += 0.08;
+        piece.rotation += piece.spin;
+        piece.life -= 1;
+        piece.alpha = Math.max(piece.life / 80, 0);
+
+        if (piece.life <= 0) {
+          confettiPieces.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.translate(piece.x, piece.y);
+        ctx.rotate(piece.rotation);
+        ctx.globalAlpha = piece.alpha;
+        ctx.fillStyle = piece.color;
+        ctx.fillRect(-piece.size / 2, -piece.size / 2, piece.size, piece.size * 0.6);
+        ctx.restore();
+      }
+
+      if (confettiPieces.length > 0) {
+        animationFrameId = window.requestAnimationFrame(animateConfetti);
+      } else {
+        animationFrameId = null;
+      }
+    }
+
+    function startConfettiAnimation() {
+      if (!animationFrameId) {
+        animationFrameId = window.requestAnimationFrame(animateConfetti);
+      }
+    }
+
+    function handleClick(event) {
+      score += 1;
+      if (score > bestScore) {
+        bestScore = score;
+        localStorage.setItem('unicorn-clicker-best', String(bestScore));
+      }
+
+      updateScoreboard();
+      button.classList.remove('pop');
+      void button.offsetWidth;
+      button.classList.add('pop');
+
+      const rect = button.getBoundingClientRect();
+      const x = event.clientX || rect.left + rect.width / 2;
+      const y = event.clientY || rect.top + rect.height / 2;
+
+      burstConfetti(x, y);
+      startConfettiAnimation();
+    }
+
+    button.addEventListener('click', handleClick);
+    window.addEventListener('resize', resizeCanvas);
+
+    resizeCanvas();
+    updateScoreboard();
+  </script>
+</body>
+</html>

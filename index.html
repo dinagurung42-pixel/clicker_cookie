@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Unicorn Clicker</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <canvas id="confetti-canvas"></canvas>
+
+    <main class="game-shell">
+      <section class="game-card">
+        <p class="eyebrow">✨ Magical click game</p>
+        <h1>Unicorn Clicker</h1>
+        <p class="subtitle">Tap the unicorn to collect sparkles and make the party explode.</p>
+
+        <div class="scoreboard">
+          <div>
+            <span class="label">Clicks</span>
+            <strong id="score">0</strong>
+          </div>
+          <div>
+            <span class="label">Best</span>
+            <strong id="best-score">0</strong>
+          </div>
+        </div>
+
+        <button id="unicornButton" class="unicorn-button" aria-label="Click the unicorn">
+          <svg viewBox="0 0 240 240" role="img" aria-hidden="true">
+            <circle cx="120" cy="120" r="96" class="halo" />
+            <ellipse cx="120" cy="132" rx="62" ry="58" class="body" />
+            <path d="M96 70 L84 44 L118 52 L112 82 Z" class="ear" />
+            <path d="M144 70 L156 44 L122 52 L128 82 Z" class="ear" />
+            <path d="M115 48 L138 22 L164 62 L132 74 Z" class="horn" />
+            <circle cx="104" cy="132" r="6" class="eye" />
+            <circle cx="136" cy="132" r="6" class="eye" />
+            <path d="M102 160 Q120 178 138 160" class="mouth" />
+            <path d="M84 106 C84 84 102 70 120 70 C138 70 156 84 156 106" class="mane" />
+            <path d="M82 116 C92 102 108 100 120 104 C132 108 148 104 158 116" class="mane-detail" />
+          </svg>
+        </button>
+
+        <p class="hint">Each click creates a new burst of confetti.</p>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
